@@ -356,21 +356,24 @@ public class PizzaStore {
     **/
    public static void CreateUser(PizzaStore esql){
       try{
-         String query = "SELECT s.sname, MAX(c.cost) " +
-                        "FROM suppliers s " +
-                        "JOIN catalog c ON s.sid = c.sid " +
-                        "JOIN parts p ON c.pid = p.pid " +
-                        "WHERE s.sid IN ( " +
-                        "    SELECT c1.sid FROM catalog c1 " +
-                        "    JOIN parts p1 ON c1.pid = p1.pid " +
-                        "    WHERE p1.color = 'Green' " +
-                        ") " +
-                        "AND s.sid IN ( " +
-                        "    SELECT c2.sid FROM catalog c2 " +
-                        "    JOIN parts p2 ON c2.pid = p2.pid " +
-                        "    WHERE p2.color = 'Red' " +
-                        ") " +
-                        "GROUP BY s.sid, s.sname;";
+         String query = "INSERT INTO Users (login, password, role, favoriteItems, phoneNum) " +
+                        "VALUES (";
+         System.out.print("\tEnter login: $");
+         String input = in.readLine();
+         query += "'" + input + "',";
+         System.out.print("\tEnter password: $");
+         input = in.readLine();
+         query += "'" + input + "',";
+         System.out.print("\tEnter role: $");
+         input = in.readLine();
+         query += "'" + input + "',";
+         System.out.print("\tEnter Favorite Items: $");
+         input = in.readLine();
+         query += "'" + input + "',";
+         System.out.print("\tEnter Phone Number: $");
+         input = in.readLine();
+         query += "'" + input + "');";
+
          int rowCount = esql.executeQuery(query);
          System.out.println ("total row(s): " + rowCount);
       }catch(Exception e){
