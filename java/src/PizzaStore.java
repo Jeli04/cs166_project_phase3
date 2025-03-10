@@ -443,7 +443,58 @@ public class PizzaStore {
 
    }
    public static void updateProfile(PizzaStore esql) {}
-   public static void viewMenu(PizzaStore esql) {}
+
+   public static void viewMenu(PizzaStore esql) {
+      // Assuming this only checks for sides, drinks, and entrees 
+      boolean ordermenu = true;
+      while(ordermenu) {
+         System.out.println("ORDER MENU");
+         System.out.println("---------");
+         System.out.println("1. View Full Menu");
+         System.out.println("2. View Sides");
+         System.out.println("3. View Drinks");
+         System.out.println("4. View Entrees");
+         System.out.println("7. Back");
+
+         switch (readChoice()){
+            case 1: 
+               try{
+                  String query = "SELECT * FROM Items;";
+                  esql.executeQueryAndPrintResult(query);
+               }catch(Exception e){
+                  System.err.println (e.getMessage());
+               }
+               break;
+            case 2: 
+               try{
+                  String query = "SELECT * FROM Items WHERE typeOfItem = ' sides';";
+                  esql.executeQueryAndPrintResult(query);
+               }catch(Exception e){
+                  System.err.println (e.getMessage());
+               }
+               break;
+            case 3: 
+               try{
+                  String query = "SELECT * FROM Items WHERE typeOfItem = ' drinks';";
+                  esql.executeQueryAndPrintResult(query);
+               }catch(Exception e){
+                  System.err.println (e.getMessage());
+               }
+               break;
+            case 4: 
+               try{
+                  String query = "SELECT * FROM Items WHERE typeOfItem = ' entree';";
+                  esql.executeQueryAndPrintResult(query);
+               }catch(Exception e){
+                  System.err.println (e.getMessage());
+               }
+               break;
+            case 7:
+               ordermenu = false;
+               break;
+         }
+      }
+   }
    public static void placeOrder(PizzaStore esql) {}
    public static void viewAllOrders(PizzaStore esql) {}
    public static void viewRecentOrders(PizzaStore esql) {}
