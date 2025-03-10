@@ -429,25 +429,48 @@ public class PizzaStore {
          System.out.println("ORDER MENU");
          System.out.println("---------");
          System.out.println("1. View Full Menu");
-         System.out.println("2. View Side");
+         System.out.println("2. View Sides");
          System.out.println("3. View Drinks");
          System.out.println("4. View Entrees");
-      }
+         System.out.println("7. Back");
 
-      try{
-         String query = "INSERT INTO Users (login, password, role, favoriteItems, phoneNum) " +
-                        "VALUES (";
-         System.out.print("\tEnter login: $");
-         String input = in.readLine();
-         query += "'" + input + "',";
-         System.out.print("\tEnter Phone Number: $");
-         input = in.readLine();
-         query += "'" + input + "');";
-
-         int rowCount = esql.executeQuery(query);
-         System.out.println ("total row(s): " + rowCount);
-      }catch(Exception e){
-         System.err.println (e.getMessage());
+         switch (readChoice()){
+            case 1: 
+               try{
+                  String query = "SELECT * FROM Items;";
+                  esql.executeQueryAndPrintResult(query);
+               }catch(Exception e){
+                  System.err.println (e.getMessage());
+               }
+               break;
+            case 2: 
+               try{
+                  String query = "SELECT * FROM Items WHERE typeOfItem = ' sides';";
+                  esql.executeQueryAndPrintResult(query);
+               }catch(Exception e){
+                  System.err.println (e.getMessage());
+               }
+               break;
+            case 3: 
+               try{
+                  String query = "SELECT * FROM Items WHERE typeOfItem = ' drinks';";
+                  esql.executeQueryAndPrintResult(query);
+               }catch(Exception e){
+                  System.err.println (e.getMessage());
+               }
+               break;
+            case 4: 
+               try{
+                  String query = "SELECT * FROM Items WHERE typeOfItem = ' entree';";
+                  esql.executeQueryAndPrintResult(query);
+               }catch(Exception e){
+                  System.err.println (e.getMessage());
+               }
+               break;
+            case 7:
+               ordermenu = false;
+               break;
+         }
       }
    }
    public static void placeOrder(PizzaStore esql) {}
