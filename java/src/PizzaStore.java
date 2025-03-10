@@ -398,9 +398,9 @@ public class PizzaStore {
          String query = "SELECT login FROM Users WHERE login = '" + entered_login + 
                        "' AND password = '" + entered_pw + "';";
          
-         List<List<String>> result = esql.executeQueryAndReturnResult(query);
+         List<List<String>> result = esql.executeQueryAndReturnResult(query); //List<List<String>>: all rows retrieved , List<String>: Represents single row//
 
-         if (!result.isEmpty()) {
+         if (!result.isEmpty()) { //found a match//
             System.out.println("Login successful. Welcome, " + entered_login + "!");
             return entered_login;  // Return the username to indicate success
         } 
