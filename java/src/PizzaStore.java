@@ -22,6 +22,9 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.List;
+
+//import com.apple.laf.resources.aqua_zh_TW;
+
 import java.util.ArrayList;
 import java.lang.Math;
 
@@ -288,7 +291,7 @@ public class PizzaStore {
                 System.out.println(".........................");
                 System.out.println("20. Log out");
                 switch (readChoice()){
-                   case 1: viewProfile(esql); break;
+                   case 1: viewProfile(esql,authorisedUser); break;
                    case 2: updateProfile(esql); break;
                    case 3: viewMenu(esql); break;
                    case 4: placeOrder(esql); break;
@@ -376,7 +379,8 @@ public class PizzaStore {
 
          int rowCount = esql.executeQuery(query);
          System.out.println ("total row(s): " + rowCount);
-      }catch(Exception e){
+      }
+      catch(Exception e){
          System.err.println (e.getMessage());
       }
    }//end CreateUser
@@ -418,7 +422,26 @@ public class PizzaStore {
 
 // Rest of the functions definition go in here
 
-   public static void viewProfile(PizzaStore esql) {}
+   public static void viewProfile(PizzaStore esql, String a) {
+      try {
+         
+ 
+         String query = "SELECT * FROM Users WHERE login = '" + a + "';";
+         List<List<String>> result = esql.executeQueryAndReturnResult(query);
+ 
+         System.out.println("\n User Profile:" + a + '\n');
+         for (List<String> row : result) {
+
+            System.out.println(String.join(" | ", row).replaceAll("\\s+\\|", " |").trim() + '\n');
+        }
+
+
+     } 
+     catch (Exception e) {
+         System.err.println("Error: " + e.getMessage());
+     }
+
+   }
    public static void updateProfile(PizzaStore esql) {}
    public static void viewMenu(PizzaStore esql) {}
    public static void placeOrder(PizzaStore esql) {}
