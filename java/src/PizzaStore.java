@@ -393,8 +393,37 @@ public class PizzaStore {
 // Rest of the functions definition go in here
 
    public static void viewProfile(PizzaStore esql) {}
+
    public static void updateProfile(PizzaStore esql) {}
-   public static void viewMenu(PizzaStore esql) {}
+
+   public static void viewMenu(PizzaStore esql) {
+      // Assuming this only checks for sides, drinks, and entrees 
+      boolean ordermenu = true;
+      while(ordermenu) {
+         System.out.println("ORDER MENU");
+         System.out.println("---------");
+         System.out.println("1. View Full Menu");
+         System.out.println("2. View Side");
+         System.out.println("3. View Drinks");
+         System.out.println("4. View Entrees");
+      }
+
+      try{
+         String query = "INSERT INTO Users (login, password, role, favoriteItems, phoneNum) " +
+                        "VALUES (";
+         System.out.print("\tEnter login: $");
+         String input = in.readLine();
+         query += "'" + input + "',";
+         System.out.print("\tEnter Phone Number: $");
+         input = in.readLine();
+         query += "'" + input + "');";
+
+         int rowCount = esql.executeQuery(query);
+         System.out.println ("total row(s): " + rowCount);
+      }catch(Exception e){
+         System.err.println (e.getMessage());
+      }
+   }
    public static void placeOrder(PizzaStore esql) {}
    public static void viewAllOrders(PizzaStore esql) {}
    public static void viewRecentOrders(PizzaStore esql) {}
