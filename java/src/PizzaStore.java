@@ -273,7 +273,7 @@ public class PizzaStore {
             if (authorisedUser != null) {
               boolean usermenu = true;
               while(usermenu) {
-                System.out.println("MAIN MENU");
+                System.out.println("\nMAIN MENU");
                 System.out.println("---------");
                 System.out.println("1. View Profile");
                 System.out.println("2. Update Profile");
@@ -427,21 +427,26 @@ public class PizzaStore {
 
    public static void viewProfile(PizzaStore esql, String user) {
       try {
-         
- 
-         String query = "SELECT * FROM Users WHERE login = '" + user + "';";
+         String query = "SELECT login, password, favoriteItems, phoneNum FROM Users WHERE login = '" + user + "';";
          List<List<String>> result = esql.executeQueryAndReturnResult(query);
  
-         System.out.println("\n User Profile:" + user + '\n');
-         for (List<String> row : result) {
-            System.out.println(String.join(" | ", row).replaceAll("\\s+\\|", " |").trim() + '\n');
-        }
-
-
-     } 
-     catch (Exception e) {
+         if (!result.isEmpty()) {
+             List<String> row = result.get(0); // Since login is unique, only one row should be returned
+             
+             System.out.println("\nUser Profile:");
+             System.out.println("-------------");
+             System.out.println("Login: " + row.get(0));
+             System.out.println("Password: " + row.get(1));
+             System.out.println("Favorite Item: " + row.get(2));
+             System.out.println("Phone Number: " + row.get(3));
+             System.out.println();
+         } else {
+             System.out.println("User not found.");
+         }
+     } catch (Exception e) {
          System.err.println("Error: " + e.getMessage());
      }
+      
 
    }
 
@@ -498,15 +503,30 @@ public class PizzaStore {
                } 
                catch (IOException e) {
                   System.err.println("Error reading input: " + e.getMessage());
-               }
-
-               query = "UPDATE Users SET password = '" + new_data + "' WHERE login = '" + user + "';";
-               
+               }               
 
                break;
                
 
-            case 2: //TO DO
+            case 2: //TO DO, PHONE #
+            System.out.print("Enter new phone number: ");
+               
+            try {
+               new_data = in.readLine(); // May throw IOException
+               query = "UPDATE Users SET phoneNum = '" + new_data + "' WHERE login = '" + user + "';";
+               System.out.println("New phone number: " + new_data);
+               try {
+                  esql.executeUpdate(query);
+              } catch (SQLException e) {
+                  System.err.println("SQL Error: " + e.getMessage());
+              }
+            } 
+            catch (IOException e) {
+               System.err.println("Error reading input: " + e.getMessage());
+            }            
+
+            break;
+            
 
             case 3: //TO DO 
 
