@@ -454,6 +454,7 @@ public class PizzaStore {
          System.out.println("2. View Sides");
          System.out.println("3. View Drinks");
          System.out.println("4. View Entrees");
+         System.out.println("5. Price Search");
          System.out.println("7. Back");
 
          switch (readChoice()){
@@ -482,6 +483,15 @@ public class PizzaStore {
                }
                break;
             case 4: 
+               try{
+                  String query = "SELECT * FROM Items WHERE typeOfItem = ' entree';";
+                  esql.executeQueryAndPrintResult(query);
+               }catch(Exception e){
+                  System.err.println (e.getMessage());
+               }
+               break;
+            case 5: 
+               System.out.println("");
                try{
                   String query = "SELECT * FROM Items WHERE typeOfItem = ' entree';";
                   esql.executeQueryAndPrintResult(query);
