@@ -19,9 +19,12 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.List;
+
+
 
 //import com.apple.laf.resources.aqua_zh_TW;
 
@@ -292,7 +295,7 @@ public class PizzaStore {
                 System.out.println("20. Log out");
                 switch (readChoice()){
                    case 1: viewProfile(esql,authorisedUser); break;
-                   case 2: updateProfile(esql); break;
+                   case 2: updateProfile(esql,authorisedUser); break;
                    case 3: viewMenu(esql); break;
                    case 4: placeOrder(esql); break;
                    case 5: viewAllOrders(esql); break;
@@ -422,16 +425,15 @@ public class PizzaStore {
 
 // Rest of the functions definition go in here
 
-   public static void viewProfile(PizzaStore esql, String a) {
+   public static void viewProfile(PizzaStore esql, String user) {
       try {
          
  
-         String query = "SELECT * FROM Users WHERE login = '" + a + "';";
+         String query = "SELECT * FROM Users WHERE login = '" + user + "';";
          List<List<String>> result = esql.executeQueryAndReturnResult(query);
  
-         System.out.println("\n User Profile:" + a + '\n');
+         System.out.println("\n User Profile:" + user + '\n');
          for (List<String> row : result) {
-
             System.out.println(String.join(" | ", row).replaceAll("\\s+\\|", " |").trim() + '\n');
         }
 
@@ -442,7 +444,86 @@ public class PizzaStore {
      }
 
    }
-   public static void updateProfile(PizzaStore esql) {}
+
+   public static String get_role(PizzaStore esql, String user) {
+      try {
+          String query = "SELECT role FROM Users WHERE login = '" + user + "';";
+          return esql.executeQueryAndReturnResult(query).get(0).get(0).trim(); 
+      } 
+      catch (Exception e) {
+          System.err.println("Error fetching role: " + e.getMessage());
+          return null; // Return null in case of an error
+      }
+  }
+
+   public static void updateProfile(PizzaStore esql, String user) { //user can change pw&#, manager can change can edit user login&pw, anyone can update favorite item//
+      
+      boolean going = true; //while 
+      String user_role = get_role(esql, user);
+
+
+      while(going){
+
+         System.out.println("\nUPDATE PROFILE ");
+         System.out.println("---------");
+
+         System.out.println("1. Password");
+         System.out.println("2. Phone number");
+         System.out.println("3. Favorite item");
+
+         
+
+         System.out.println("4. Exit");
+
+         if(user_role.trim().equals("manager")){ 
+            System.out.println("5. Users information");
+         }
+
+         String new_data = "";
+         String query = "";
+
+         switch(readChoice()){
+            case 1: //DONE
+               System.out.print("Enter new password: ");
+               
+               try {
+                  new_data = in.readLine(); // May throw IOException
+                  query = "UPDATE Users SET password = '" + new_data + "' WHERE login = '" + user + "';";
+                  System.out.println("New password: " + new_data);
+                  try {
+                     esql.executeUpdate(query);
+                 } catch (SQLException e) {
+                     System.err.println("SQL Error: " + e.getMessage());
+                 }
+               } 
+               catch (IOException e) {
+                  System.err.println("Error reading input: " + e.getMessage());
+               }
+
+               query = "UPDATE Users SET password = '" + new_data + "' WHERE login = '" + user + "';";
+               
+
+               break;
+               
+
+            case 2: //TO DO
+
+            case 3: //TO DO 
+
+            case 4: //DONE
+               going = false;
+            
+
+            case 5:
+               
+         }
+         
+   }
+
+
+   }
+         
+   
 
    public static void viewMenu(PizzaStore esql) {
       // Assuming this only checks for sides, drinks, and entrees 
