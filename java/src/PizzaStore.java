@@ -486,60 +486,55 @@ public class PizzaStore {
 
          String new_data = "";
          String query = "";
+         String action = "";
+         String action_query = "";
 
          switch(readChoice()){
-            case 1: //DONE
-               System.out.print("Enter new password: ");
-               
-               try {
-                  new_data = in.readLine(); // May throw IOException
-                  query = "UPDATE Users SET password = '" + new_data + "' WHERE login = '" + user + "';";
-                  System.out.println("New password: " + new_data);
-                  try {
-                     esql.executeUpdate(query);
-                 } catch (SQLException e) {
-                     System.err.println("SQL Error: " + e.getMessage());
-                 }
-               } 
-               catch (IOException e) {
-                  System.err.println("Error reading input: " + e.getMessage());
-               }               
+            case 1: //PW FINISHED
+               action = "password";
+               action_query = "password";     
 
                break;
                
-
-            case 2: //TO DO, PHONE #
-            System.out.print("Enter new phone number: ");
-               
-            try {
-               new_data = in.readLine(); // May throw IOException
-               query = "UPDATE Users SET phoneNum = '" + new_data + "' WHERE login = '" + user + "';";
-               System.out.println("New phone number: " + new_data);
-               try {
-                  esql.executeUpdate(query);
-              } catch (SQLException e) {
-                  System.err.println("SQL Error: " + e.getMessage());
-              }
-            } 
-            catch (IOException e) {
-               System.err.println("Error reading input: " + e.getMessage());
-            }            
+            case 2: //PHONE # FINISHED
+            action = "phone number";
+            action_query = "phoneNum";          
 
             break;
             
-
-            case 3: //TO DO 
+            case 3: //DONE
+               action = "favorite item";
+               action_query = "favoriteItems";
+                  
+               break;
 
             case 4: //DONE
                going = false;
+               break;
             
 
             case 5:
                
          }
+         if(going){
+            try {
+               System.out.print("Enter new " + action +": ");
+
+               new_data = in.readLine(); // May throw IOException
+               query = "UPDATE Users SET "+ action_query + " = '" + new_data + "' WHERE login = '" + user + "';";
+               System.out.println("New " + action + ": " + new_data);
+               try {
+                  esql.executeUpdate(query);
+            } catch (SQLException e) {
+                  System.err.println("SQL Error: " + e.getMessage());
+            }
+            } 
+            catch (IOException e) {
+               System.err.println("Error reading input: " + e.getMessage());
+            }
+      }
          
    }
-
 
    }
          
