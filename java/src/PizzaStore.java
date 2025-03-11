@@ -19,9 +19,12 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.List;
+
+
 
 //import com.apple.laf.resources.aqua_zh_TW;
 
@@ -270,7 +273,7 @@ public class PizzaStore {
             if (authorisedUser != null) {
               boolean usermenu = true;
               while(usermenu) {
-                System.out.println("MAIN MENU");
+                System.out.println("\nMAIN MENU");
                 System.out.println("---------");
                 System.out.println("1. View Profile");
                 System.out.println("2. Update Profile");
@@ -292,7 +295,7 @@ public class PizzaStore {
                 System.out.println("20. Log out");
                 switch (readChoice()){
                    case 1: viewProfile(esql,authorisedUser); break;
-                   case 2: updateProfile(esql); break;
+                   case 2: updateProfile(esql,authorisedUser); break;
                    case 3: viewMenu(esql); break;
                    case 4: placeOrder(esql); break;
                    case 5: viewAllOrders(esql); break;
@@ -422,27 +425,194 @@ public class PizzaStore {
 
 // Rest of the functions definition go in here
 
-   public static void viewProfile(PizzaStore esql, String a) {
+public static void viewProfile(PizzaStore esql, String user) {
+   try {
+       // Now selecting role along with other fields
+       String query = "SELECT login, password, role, favoriteItems, phoneNum FROM Users WHERE login = '" + user + "';";
+       List<List<String>> result = esql.executeQueryAndReturnResult(query);
+
+       if (!result.isEmpty()) {
+           List<String> row = result.get(0); // Only one row expected since login is unique
+           
+           System.out.println("\nUser Profile:");
+           System.out.println("-------------");
+           System.out.println("Login: " + row.get(0));
+           System.out.println("Password: " + row.get(1));
+           System.out.println("Role: " + row.get(2));  // Added Role output
+           System.out.println("Favorite Item: " + row.get(3));
+           System.out.println("Phone Number: " + row.get(4));
+           System.out.println();
+       } else {
+           System.out.println("User not found.");
+       }
+   } catch (Exception e) {
+       System.err.println("Error: " + e.getMessage());
+   }
+}
+
+
+   public static String get_role(PizzaStore esql, String user) {
       try {
+          String query = "SELECT role FROM Users WHERE login = '" + user + "';";
+          return esql.executeQueryAndReturnResult(query).get(0).get(0).trim(); 
+      } 
+      catch (Exception e) {
+          System.err.println("Error fetching role: " + e.getMessage());
+          return null; // Return null in case of an error
+      }
+  }
+
+   public static void updateProfile(PizzaStore esql, String user) { //user can change pw&#, manager can change can edit user login&pw&role, anyone can update favorite item//
+      
+      boolean going = true; //while 
+      String user_role = get_role(esql, user);
+
+
+      while(going){
          
- 
-         String query = "SELECT * FROM Users WHERE login = '" + a + "';";
-         List<List<String>> result = esql.executeQueryAndReturnResult(query);
- 
-         System.out.println("\n User Profile:" + a + '\n');
-         for (List<String> row : result) {
+         System.out.println("\nUPDATE PROFILE ");
+         System.out.println("---------");
 
-            System.out.println(String.join(" | ", row).replaceAll("\\s+\\|", " |").trim() + '\n');
-        }
+         System.out.println("1. Password");
+         System.out.println("2. Phone number");
+         System.out.println("3. Favorite item");
+         System.out.println("4. Exit");
 
+         if(user_role.trim().equals("manager")){ 
+            System.out.println("5. Users information");
+         }
 
-     } 
-     catch (Exception e) {
-         System.err.println("Error: " + e.getMessage());
-     }
+         String new_data = "";
+         String query = "";
+         String action = "";
+         String action_query = "";
+         String managed_user = ""; //if manager wants to change a users login or pw//
+
+         switch(readChoice()){
+            case 1: //PW FINISHED
+               action = "password";
+               action_query = "password";     
+
+               break;
+               
+            case 2: //PHONE # FINISHED
+            action = "phone number";
+            action_query = "phoneNum";          
+
+            break;
+            
+            case 3: //DONE
+               action = "favorite item";
+               action_query = "favoriteItems";
+                  
+               break;
+
+            case 4: //DONE
+               going = false;
+               break;
+            
+
+            case 5:
+
+               System.out.print("Enter the username of the user to modify: ");
+
+               while (true) {
+                  try {
+                     System.out.print("Enter the username of the user to modify: ");
+                     managed_user = in.readLine(); // Read the username
+            
+                     // Check if the user exists in the database
+                     String checkQuery = "SELECT COUNT(*) FROM Users WHERE login = '" + managed_user + "';";
+                     List<List<String>> result = esql.executeQueryAndReturnResult(checkQuery);
+            
+                     if (!result.isEmpty() && Integer.parseInt(result.get(0).get(0)) > 0) {
+                        break; // Exit loop if user exists
+                     } else {
+                        System.out.println("Error: User does not exist. Please enter a valid username.");
+                     }
+                  } catch (IOException e) {
+                     System.err.println("Error reading input: " + e.getMessage());
+                  } catch (SQLException e) {
+                     System.err.println("SQL Error: " + e.getMessage());
+                  }
+            }
+            
+
+               // Display options
+               System.out.println("1. Change Login");
+               System.out.println("2. Change Role");
+
+               int choice = readChoice();
+
+               if (choice == 1) {
+                  try {
+                     System.out.print("Enter new login: ");
+                     String new_login = in.readLine();
+                     
+                     // Update login in the database
+                     query = "UPDATE Users SET login = '" + new_login + "' WHERE login = '" + managed_user + "';";
+                     esql.executeUpdate(query);
+                     
+                     System.out.println("User login updated successfully.");
+                  } catch (IOException e) {
+                     System.err.println("Error reading input: " + e.getMessage());
+                  } catch (SQLException e) {
+                     System.err.println("SQL Error: " + e.getMessage());
+                  }
+               } 
+               else if (choice == 2) {
+                  try {
+                     System.out.print("Enter new role: ");
+                     String new_role = in.readLine();
+
+                     while (true) {
+                        if (!(new_role.equals("manager") || new_role.equals("user") || new_role.equals("driver"))) {
+                            System.out.print("Error: Enter new role (manager, user, driver) (no space): ");
+                            new_role = in.readLine();
+                        } 
+                        else {
+                            break; // Exit the loop if the input is correct
+                        }
+                    }
+
+                     // Update role in the database
+                     query = "UPDATE Users SET role = '" + new_role + "' WHERE login = '" + managed_user + "';";
+                     esql.executeUpdate(query);
+                     
+                     System.out.println("User role updated successfully.");
+                  } catch (IOException e) {
+                     System.err.println("Error reading input: " + e.getMessage());
+                  } catch (SQLException e) {
+                     System.err.println("SQL Error: " + e.getMessage());
+                  }
+               } 
+               else {
+                  System.out.println("Invalid choice. Please select 1 or 2.");
+               }
+               
+         }
+         if(going && managed_user == ""){
+            try {
+               System.out.print("Enter new " + action +": ");
+
+               new_data = in.readLine(); // May throw IOException
+               query = "UPDATE Users SET "+ action_query + " = '" + new_data + "' WHERE login = '" + user + "';";
+               System.out.println("New " + action + ": " + new_data);
+               try {
+                  esql.executeUpdate(query);
+            } catch (SQLException e) {
+                  System.err.println("SQL Error: " + e.getMessage());
+            }
+            } 
+            catch (IOException e) {
+               System.err.println("Error reading input: " + e.getMessage());
+            }
+      }
+         
+   }
 
    }
-   public static void updateProfile(PizzaStore esql) {}
+         
 
    public static void viewMenu(PizzaStore esql) {
       // Assuming this only checks for sides, drinks, and entrees 
