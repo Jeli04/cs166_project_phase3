@@ -607,12 +607,19 @@ public static void viewProfile(PizzaStore esql, String user) {
             catch (IOException e) {
                System.err.println("Error reading input: " + e.getMessage());
             }
+         }
       }
-         
    }
 
+   // Helper function for viewMenu
+   public static boolean isFloat(String str) {
+      try {
+         Float.parseFloat(str);
+         return true;
+      } catch (NumberFormatException e) {
+         return false;
+      }
    }
-         
 
    public static void viewMenu(PizzaStore esql) {
       // Assuming this only checks for sides, drinks, and entrees 
@@ -624,8 +631,10 @@ public static void viewProfile(PizzaStore esql, String user) {
          System.out.println("2. View Sides");
          System.out.println("3. View Drinks");
          System.out.println("4. View Entrees");
-         System.out.println("5. Price Search");
-         System.out.println("7. Back");
+         System.out.println("5. Under Price Search");
+         System.out.println("6. Ascending Prices");
+         System.out.println("7. Descending Prices");
+         System.out.println("8. Back");
 
          switch (readChoice()){
             case 1: 
@@ -661,15 +670,36 @@ public static void viewProfile(PizzaStore esql, String user) {
                }
                break;
             case 5: 
-               System.out.println("");
                try{
-                  String query = "SELECT * FROM Items WHERE typeOfItem = ' entree';";
+                  String price = "";
+                  while(!isFloat(price)){
+                     System.out.println("Enter a price: ");
+                     price = in.readLine();
+                  }
+
+                  String query = "SELECT * FROM Items WHERE price < " + price + ";";
                   esql.executeQueryAndPrintResult(query);
                }catch(Exception e){
                   System.err.println (e.getMessage());
                }
                break;
-            case 7:
+            case 6: 
+               try{
+                  String query = "SELECT * FROM Items ORDER BY price ASC;";
+                  esql.executeQueryAndPrintResult(query);
+               }catch(Exception e){
+                  System.err.println (e.getMessage());
+               }
+               break;
+            case 7: 
+               try{
+                  String query = "SELECT * FROM Items ORDER BY price DESC;";
+                  esql.executeQueryAndPrintResult(query);
+               }catch(Exception e){
+                  System.err.println (e.getMessage());
+               }
+               break;
+            case 8:
                ordermenu = false;
                break;
          }
@@ -683,7 +713,6 @@ public static void viewProfile(PizzaStore esql, String user) {
    public static void updateOrderStatus(PizzaStore esql) {}
    public static void updateMenu(PizzaStore esql) {}
    public static void updateUser(PizzaStore esql) {}
-
 
 }//end PizzaStore
 
