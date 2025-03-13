@@ -302,7 +302,10 @@ public class PizzaStore {
                    case 6: viewRecentOrders(esql); break;
                    case 7: viewOrderInfo(esql); break;
                    case 8: viewStores(esql); break;
-                   case 9: updateOrderStatus(esql); break;
+                   case 9: 
+                     if 
+                     updateOrderStatus(esql); 
+                     break;
                    case 10: updateMenu(esql); break;
                    case 11: updateUser(esql); break;
 
@@ -710,8 +713,13 @@ public static void viewProfile(PizzaStore esql, String user) {
    public static void viewRecentOrders(PizzaStore esql) {}
    public static void viewOrderInfo(PizzaStore esql) {}
    public static void viewStores(PizzaStore esql) {}
-   public static void updateOrderStatus(PizzaStore esql) {}
-   public static void updateMenu(PizzaStore esql) {}
+   public static void updateOrderStatus(PizzaStore esql) {
+
+   }
+
+   public static void updateMenu(PizzaStore esql) {
+
+   }
    public static void updateUser(PizzaStore esql) {}
 
 }//end PizzaStore
