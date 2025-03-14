@@ -301,7 +301,7 @@ public class PizzaStore {
                    case 2: updateProfile(esql,authorisedUser); break;
                    case 3: viewMenu(esql); break;
                    case 4: placeOrder(esql, authorisedUser); break;
-                   case 5: viewAllOrders(esql); break;
+                   case 5: viewAllOrders(esql, authorisedUser); break;
                    case 6: viewRecentOrders(esql); break;
                    case 7: viewOrderInfo(esql); break;
                    case 8: viewStores(esql); break;
@@ -901,7 +901,7 @@ public static void viewProfile(PizzaStore esql, String user) {
          System.out.println("---------");
          printPrices(esql, orderID);
          System.out.println("---------");
-         System.out.println("Total Price: " + totalPrice);
+         System.out.println("Total Price: " + String.format("%.2f", totalPrice));
          System.out.println("---------");
 
          // Confirm order with the user
@@ -934,7 +934,22 @@ public static void viewProfile(PizzaStore esql, String user) {
    }
 
 
-   public static void viewAllOrders(PizzaStore esql) {}
+   public static void viewAllOrders(PizzaStore esql, String userLogin) {
+      String role = get_role(esql, userLogin);
+      String query = "SELECT iio.itemName, iio.quantity, (i.price * iio.quantity) AS totalCost " +
+                     "FROM FoodOrder fo " +
+                     "JOIN ItemsInOrder iio ON fo.orderID = iio.orderID " +
+                     "JOIN Items i ON iio.itemName = i.itemName ";
+                           
+      if(role.equals("customer")){
+         query = query + "WHERE fo.login = '" + userLogin + "';";
+      }
+      try{
+         esql.executeQueryAndPrintResult(query);
+      }catch (Exception e) {
+         System.err.println("Error: " + e.getMessage());
+      }
+   }
    public static void viewRecentOrders(PizzaStore esql) {}
    public static void viewOrderInfo(PizzaStore esql) {}
 
