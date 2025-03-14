@@ -303,7 +303,7 @@ public class PizzaStore {
                    case 4: placeOrder(esql, authorisedUser); break;
                    case 5: viewAllOrders(esql, authorisedUser); break;
                    case 6: viewRecentOrders(esql, authorisedUser); break;
-                   case 7: viewOrderInfo(esql); break;
+                   case 7: viewOrderInfo(esql, authorisedUser); break;
                    case 8: viewStores(esql); break;
                    case 9: updateOrderStatus(esql,authorisedUser); break;
                    case 10: updateMenu(esql,authorisedUser); break;
@@ -971,7 +971,24 @@ public static void viewProfile(PizzaStore esql, String user) {
          System.err.println("Error: " + e.getMessage());
       }
    }
-   public static void viewOrderInfo(PizzaStore esql) {}
+
+   public static void viewOrderInfo(PizzaStore esql, String userLogin) {
+      String role = get_role(esql, userLogin);
+      String query = "SELECT fo.orderID, fo.orderTimestamp, fo.orderStatus, " +
+                     "iio.itemName, iio.quantity, (i.price * iio.quantity) AS totalCost " +
+                     "FROM FoodOrder fo " +
+                     "JOIN ItemsInOrder iio ON fo.orderID = iio.orderID " +
+                     "JOIN Items i ON iio.itemName = i.itemName ";
+                              
+      if(role.equals("customer")){
+         query += "WHERE fo.login = '" + userLogin + "' ";
+      }
+      try{
+         esql.executeQueryAndPrintResult(query);
+      } catch (Exception e) {
+         System.err.println("Error: " + e.getMessage());
+      }
+   }
 
    public static void viewStores(PizzaStore esql) {
       try {
