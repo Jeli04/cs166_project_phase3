@@ -770,7 +770,8 @@ public static void viewProfile(PizzaStore esql, String user) {
          }
       }
    }
-
+   
+   // Helper function to check valid store
    public static int validStore(PizzaStore esql, String userStore){
       String query = "SELECT * FROM Store WHERE storeID = " + userStore + ";";
       int rowCount = 0;
@@ -782,6 +783,7 @@ public static void viewProfile(PizzaStore esql, String user) {
       return rowCount;
    }
 
+   // Helper function to check valid order
    public static int validOrder(PizzaStore esql, String userOrder){
       String query = "SELECT * FROM Items WHERE itemName = '" + userOrder + "';";
       int rowCount = 0;
@@ -793,6 +795,7 @@ public static void viewProfile(PizzaStore esql, String user) {
       return rowCount;
    }
 
+   // Helper function to generate the unique OrderID
    public static int generateOrderID(PizzaStore esql, String userStore) {
       String query = "SELECT MAX(orderID) FROM FoodOrder WHERE storeID = " + userStore + ";";
       int orderID = 0;
@@ -811,6 +814,7 @@ public static void viewProfile(PizzaStore esql, String user) {
       return orderID;
    }
    
+   // Helper function to print prices
    public static void printPrices(PizzaStore esql, int orderID){
       String query = "SELECT iio.itemName, iio.quantity, i.price * iio.quantity AS totalCost "
                   + "FROM ItemsInOrder iio "
