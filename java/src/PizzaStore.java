@@ -23,7 +23,8 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.List;
-
+import java.time.LocalDateTime; // getting time
+import java.time.format.DateTimeFormatter;
 
 
 //import com.apple.laf.resources.aqua_zh_TW;
@@ -302,10 +303,7 @@ public class PizzaStore {
                    case 6: viewRecentOrders(esql); break;
                    case 7: viewOrderInfo(esql); break;
                    case 8: viewStores(esql); break;
-                   case 9: 
-                     if 
-                     updateOrderStatus(esql); 
-                     break;
+                   case 9: updateOrderStatus(esql); break;
                    case 10: updateMenu(esql); break;
                    case 11: updateUser(esql); break;
 
@@ -708,7 +706,132 @@ public static void viewProfile(PizzaStore esql, String user) {
          }
       }
    }
-   public static void placeOrder(PizzaStore esql) {}
+
+   public static int validStore(PizzaStore esql, String userStore){
+      String query = "SELECT * FROM Store WHERE storeID = " + userStore + ";";
+      int rowCount = 0;
+      try{
+         rowCount = esql.executeQuery(query);
+      } catch (SQLException e) {
+         return 0;
+      }
+      return rowCount;
+   }
+
+   public static int validOrder(PizzaStore esql, String userOrder){
+      String query = "SELECT * FROM Items WHERE itemName = '" + userOrder + "';";
+      int rowCount = 0;
+      try{
+         rowCount = esql.executeQuery(query);
+      } catch (SQLException e) {
+         return 0;
+      }
+      return rowCount;
+   }
+
+   public static int generateOrderID(PizzaStore esql){
+      String query = "SELECT MAX(orderID) FROM FoodOrder;";
+      int orderID = 0;
+      try{
+         orderID = esql.executeQueryAndReturnResult(query);
+      } catch (SQLException e) {
+         return -1;
+      }
+      return orderID;
+   }
+   
+   public static float printPrices(PizzaStore esql, int orderID){
+      String query = "SELECT iio.itemName, iio.quantity, i.price * iio.quantity AS totalCost "
+                  + "FROM ItemsInOrder iio "
+                  + "JOIN Items i ON iio.itemName = i.itemName "
+                  + "WHERE iio.orderID = " + orderID + ";";      
+             
+      try{
+         orderID = esql.executeQueryAndPrintResult(query);
+      } catch (SQLException e) {
+         return;
+      }
+   }
+
+   public static void placeOrder(PizzaStore esql) {
+      try{
+         String userStore = "";
+         while(validStore(esql, userStore) < 1){
+            System.out.println("Which store to place your order: $");
+            userStore = in.readLine();
+         }
+
+         String userOrder = "";
+         String option = "";
+         boolean going = true;
+         Scanner scanner = new Scanner(System.in);
+         int orderID = generateOrderID(esql);
+         float totalPrice = 0.0;
+
+         while(going){
+            System.out.println("\nOrder for Store " + userStore);
+            System.out.println("---------");
+            System.out.println("1. Place Item Order");       
+            System.out.println("2. Finish Order");
+
+            switch (readChoice()){
+               case 1:          
+                  while(validOrder(esql, userOrder) < 1){
+                     System.out.println("Place your order: $");
+                     userOrder = in.readLine();
+                  }
+
+                  int quantity = 1;
+                  do {
+                     System.out.print("Enter a quantity: ");
+                     try {
+                           quantity = Integer.parseInt(in.readLine());
+                           break;
+                     } catch (Exception e) {
+                           System.out.println("Invalid input. Please enter a valid integer.");
+                     }
+                  } while (true);
+
+                  System.out.println("Placing order of " + quantity + "x "+ userOrder);
+                  
+                  // Get time
+                  LocalDateTime now = LocalDateTime.now();
+                  DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                  String timestamp = now.format(formatter);
+
+                  String query = "INSERT INTO ItemsInOrder (orderID, itemName, quantity)" + 
+                                 "VALUES (" + orderID + ", '" + userOrder + "'," + quantity + ");";
+                  esql.executeUpdate(query);
+
+                  // update total price 
+                  String query = "SELECT price FROM Items WHERE itemName = '" + userOrder + "';";
+                  totalPrice += esql.executeQueryAndReturnResult(query);
+
+                  break;
+               case 2:
+                  going = false;
+                  break;
+               default:
+                  System.out.println("Invalid option. Please enter 1 or 2.");
+                  break;
+            }
+         }
+         System.out.println("\nORDER TOTAL ");
+         System.out.println("---------");
+         printPrices(PizzaStore esql, int orderID);
+         System.out.println("---------");
+         System.out.println("---------");
+
+
+         String query = "INSERT INTO FoodOrder (orderID, login, storeID, totalPrice, orderTimestamp, orderStatus)" + 
+               "VALUES ('user789', 6, 22.49" + "," timestamp ", 'incomplete');";
+      }
+      catch(Exception e){
+         System.err.println (e.getMessage());
+      }
+   }
+
+
    public static void viewAllOrders(PizzaStore esql) {}
    public static void viewRecentOrders(PizzaStore esql) {}
    public static void viewOrderInfo(PizzaStore esql) {}
