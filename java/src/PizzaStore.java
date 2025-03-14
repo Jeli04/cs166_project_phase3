@@ -603,9 +603,6 @@ public static void viewProfile(PizzaStore esql, String user) {
          catch (SQLException e) {
             System.err.println("SQL Error: " + e.getMessage());
          } 
-         
-                     
-         
                // Display options
                System.out.println("1. Change Login");
                System.out.println("2. Change Role");
