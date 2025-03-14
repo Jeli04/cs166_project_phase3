@@ -302,7 +302,7 @@ public class PizzaStore {
                    case 6: viewRecentOrders(esql); break;
                    case 7: viewOrderInfo(esql); break;
                    case 8: viewStores(esql); break;
-                   case 9: updateOrderStatus(esql); break;
+                   case 9: updateOrderStatus(esql,authorisedUser); break;
                    case 10: updateMenu(esql,authorisedUser); break;
                    case 11: updateUser(esql); break;
 
@@ -794,10 +794,85 @@ public static void viewProfile(PizzaStore esql, String user) {
       }
   }
 
-   public static void updateOrderStatus(PizzaStore esql) {
+  public static void updateOrderStatus(PizzaStore esql, String user) {
+   try {
+       // Check if the user is a manager or driver
+       String roleQuery = "SELECT role FROM Users WHERE login = '" + user + "';";
+       String role = esql.executeQueryAndReturnResult(roleQuery).get(0).get(0).trim();
 
+       if (!role.equalsIgnoreCase("manager") && !role.equalsIgnoreCase("driver")) {
+           System.out.println("Access Denied: Only managers or drivers can update order status.");
+           return;
+       }
 
+       boolean updating = true;
+       while (updating) {
+           // Display all pending/incomplete orders
+           System.out.println("\nPENDING & INCOMPLETE ORDERS:");
+           String listOrdersQuery = "SELECT orderID, login, storeID, totalPrice, orderStatus FROM FoodOrder WHERE orderStatus != 'complete' ORDER BY orderID;";
+           esql.executeQueryAndPrintResult(listOrdersQuery);
+
+           System.out.println("\nOptions:");
+           System.out.println("1. Update an Order Status");
+           System.out.println("2. Exit");
+           System.out.print("Enter your choice: ");
+
+           int choice = readChoice();
+           if (choice == 2) {
+               updating = false;
+               continue;
+           } else if (choice != 1) {
+               System.out.println("Invalid choice. Try again.");
+               continue;
+           }
+
+           System.out.print("\nEnter the Order ID to update (or type 'exit' to cancel): ");
+           String orderID = in.readLine().trim();
+           if (orderID.equalsIgnoreCase("exit")) {
+               updating = false;
+               continue;
+           }
+
+           // Verify the order exists
+           String checkOrderQuery = "SELECT COUNT(*) FROM FoodOrder WHERE orderID = '" + orderID + "';";
+           int count = Integer.parseInt(esql.executeQueryAndReturnResult(checkOrderQuery).get(0).get(0));
+
+           if (count == 0) {
+               System.out.println("Error: Order ID not found.");
+               continue;
+           }
+
+           // Ask for new order status using numbers
+           System.out.println("\nSet Order Status:");
+           System.out.println("1. Incomplete");
+           System.out.println("2. Complete");
+           System.out.print("Enter your choice: ");
+           
+           int statusChoice = readChoice();
+           String newStatus = "";
+
+           if (statusChoice == 1) {
+               newStatus = "incomplete"; // Stored in lowercase
+           } else if (statusChoice == 2) {
+               newStatus = "complete"; // Stored in lowercase
+           } else {
+               System.out.println("Invalid choice. Returning to menu.");
+               continue;
+           }
+
+           // Update order status
+           String updateQuery = "UPDATE FoodOrder SET orderStatus = '" + newStatus + "' WHERE orderID = '" + orderID + "';";
+           esql.executeUpdate(updateQuery);
+
+           System.out.println("✅ Order ID " + orderID + " updated to status: " + newStatus);
+       }
+   } catch (Exception e) {
+       System.err.println("Error: " + e.getMessage());
    }
+}
+
+
+
 
    public static void updateMenu(PizzaStore esql, String user) {
       try {
