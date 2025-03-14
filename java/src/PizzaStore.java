@@ -669,8 +669,134 @@ public static void viewProfile(PizzaStore esql, String user) {
    public static void viewAllOrders(PizzaStore esql) {}
    public static void viewRecentOrders(PizzaStore esql) {}
    public static void viewOrderInfo(PizzaStore esql) {}
-   public static void viewStores(PizzaStore esql) {}
-   public static void updateOrderStatus(PizzaStore esql) {}
+
+   public static void viewStores(PizzaStore esql) {
+      boolean going = true;
+  
+      while (going) {
+          System.out.println("\nSTORES LIST");
+          System.out.println("------------");
+          System.out.println("FILTER BY");
+          System.out.println("1. City");
+          System.out.println("2. State");
+          System.out.println("3. Is Open");
+          System.out.println("4. Rating");
+          System.out.println("------------");
+          System.out.println("5. Exit");
+  
+          String filterCondition = "";
+          String userInput = "";
+          int choice = readChoice();
+  
+          switch (choice) {
+              case 1: // Filter by City
+                  System.out.print("Enter city name: ");
+                  try {
+                      userInput = in.readLine().trim();
+                      filterCondition = " WHERE city ILIKE '" + userInput + "' ";
+                  } catch (IOException e) {
+                      System.err.println("Error reading input: " + e.getMessage());
+                  }
+                  break;
+  
+              case 2: // Filter by State
+                  System.out.print("Enter state name: ");
+                  try {
+                      userInput = in.readLine().trim();
+                      filterCondition = " WHERE state ILIKE '" + userInput + "' ";
+                  } catch (IOException e) {
+                      System.err.println("Error reading input: " + e.getMessage());
+                  }
+                  break;
+  
+              case 3: // Filter by Open/Closed g)
+                  System.out.print("Show only open stores? (yes/no): ");
+                  try {
+                      userInput = in.readLine().trim().toLowerCase();
+                      if (userInput.equals("yes")) {
+                          filterCondition = " WHERE isOpen ILIKE 'yes' ";
+                      } else if (userInput.equals("no")) {
+                          filterCondition = " WHERE isOpen ILIKE 'no' ";
+                      } else {
+                          System.out.println("Invalid input. Showing all stores.");
+                      }
+                  } catch (IOException e) {
+                      System.err.println("Error reading input: " + e.getMessage());
+                  }
+                  break;
+  
+              case 4: 
+                  System.out.print("Enter minimum rating (1.0 - 5.0): ");
+                  try {
+                      float rating = Float.parseFloat(in.readLine().trim());
+                      while (rating < 1.0 || rating > 5.0) {
+                          System.out.print("Invalid rating. Enter a value between 1.0 and 5.0: ");
+                          rating = Float.parseFloat(in.readLine().trim());
+                      }
+                      filterCondition = " WHERE reviewScore >= " + rating + " ";
+                  } catch (IOException | NumberFormatException e) {
+                      System.err.println("Invalid input. Please enter a valid number.");
+                  }
+                  break;
+  
+              case 5: // Exit
+                  going = false;
+                  continue;
+  
+              default:
+                  System.out.println("Invalid choice. Try again.");
+                  continue;
+          }
+  
+          // Only execute the query if a filter was selected
+          if (!filterCondition.isEmpty()) {
+              String query = "SELECT storeID, address, city, state, isOpen, reviewScore FROM Store" + filterCondition + ";";
+  
+              try {
+                  List<List<String>> results = esql.executeQueryAndReturnResult(query);
+  
+                  if (results.isEmpty()) {
+                      System.out.println("No matching stores found.");
+                  } else {
+                      // Calculate max column widths dynamically
+                      int[] columnWidths = {10, 25, 12, 15, 8, 8}; // Default widths
+  
+                      // Adjust column widths based on actual data
+                      for (List<String> row : results) {
+                          columnWidths[0] = Math.max(columnWidths[0], row.get(0).length()); // Store ID
+                          columnWidths[1] = Math.max(columnWidths[1], row.get(1).length()); // Address
+                          columnWidths[2] = Math.max(columnWidths[2], row.get(2).length()); // City
+                          columnWidths[3] = Math.max(columnWidths[3], row.get(3).length()); // State
+                          columnWidths[4] = Math.max(columnWidths[4], row.get(4).length()); // Open/Closed
+                          columnWidths[5] = Math.max(columnWidths[5], row.get(5).length()); // Rating
+                      }
+  
+                      String format = "| %-" + columnWidths[0] + "s | %-" + columnWidths[1] + "s | %-" + columnWidths[2] + "s | %-" + columnWidths[3] + "s | %-" + columnWidths[4] + "s | %-" + columnWidths[5] + "s |\n";
+  
+                      String lineSeparator = "+-" + "-".repeat(columnWidths[0]) + "-+-" + "-".repeat(columnWidths[1]) + "-+-" +
+                                             "-".repeat(columnWidths[2]) + "-+-" + "-".repeat(columnWidths[3]) + "-+-" +
+                                             "-".repeat(columnWidths[4]) + "-+-" + "-".repeat(columnWidths[5]) + "-+";
+  
+                      System.out.println(lineSeparator);
+                      System.out.printf(format, "Store ID", "Address", "City", "State", "Open", "Rating");
+                      System.out.println(lineSeparator);
+  
+                      // Print each row with proper alignment
+                      for (List<String> row : results) {
+                          System.out.printf(format, row.get(0), row.get(1), row.get(2), row.get(3), row.get(4), row.get(5));
+                      }
+                      System.out.println(lineSeparator);
+                  }
+              } catch (SQLException e) {
+                  System.err.println("SQL Error: " + e.getMessage());
+              }
+          }
+      }
+  }
+
+   public static void updateOrderStatus(PizzaStore esql) {
+
+   }
    public static void updateMenu(PizzaStore esql) {}
    public static void updateUser(PizzaStore esql) {}
 
