@@ -303,7 +303,7 @@ public class PizzaStore {
                    case 7: viewOrderInfo(esql); break;
                    case 8: viewStores(esql); break;
                    case 9: updateOrderStatus(esql); break;
-                   case 10: updateMenu(esql); break;
+                   case 10: updateMenu(esql,authorisedUser); break;
                    case 11: updateUser(esql); break;
 
 
@@ -796,8 +796,88 @@ public static void viewProfile(PizzaStore esql, String user) {
 
    public static void updateOrderStatus(PizzaStore esql) {
 
+
    }
-   public static void updateMenu(PizzaStore esql) {}
+
+   public static void updateMenu(PizzaStore esql, String user) {
+      try {
+          // Check if the user is a manager
+          String roleQuery = "SELECT role FROM Users WHERE login = '" + user + "';";
+          String role = esql.executeQueryAndReturnResult(roleQuery).get(0).get(0).trim();
+  
+          if (!role.equalsIgnoreCase("manager")) {
+              System.out.println("Access Denied: Only managers can update the menu.");
+              return;
+          }
+  
+          boolean menuLoop = true;
+          while (menuLoop) {
+              System.out.println("\nMENU MANAGEMENT");
+              System.out.println("1. Add New Item");
+              System.out.println("2. Update Existing Item");
+              System.out.println("3. Exit");
+  
+              switch (readChoice()) {
+                  case 1: // Add New Item
+                      System.out.print("Enter item name: ");
+                      String itemName = in.readLine().trim();
+  
+                      System.out.print("Enter ingredients: ");
+                      String ingredients = in.readLine().trim();
+  
+                      System.out.print("Enter item type (e.g., pizza, drink, side): ");
+                      String type = in.readLine().trim();
+  
+                      System.out.print("Enter price: ");
+                      String price = in.readLine().trim();
+  
+                      System.out.print("Enter description: ");
+                      String description = in.readLine().trim();
+  
+                      String addQuery = "INSERT INTO Items (itemName, ingredients, typeOfItem, price, description) " +
+                                        "VALUES ('" + itemName + "', '" + ingredients + "', '" + type + "', " + price + ", '" + description + "');";
+                      
+                      esql.executeUpdate(addQuery);
+                      System.out.println("Item added successfully!");
+                      break;
+  
+                  case 2: // Update Existing Item
+                      System.out.println("\nCURRENT MENU ITEMS:");
+                      String listQuery = "SELECT itemName, price FROM Items ORDER BY itemName;";
+                      esql.executeQueryAndPrintResult(listQuery);
+  
+                      System.out.print("\nEnter the name of the item to update: ");
+                      String existingItem = in.readLine().trim();
+  
+                      System.out.print("Enter new price: ");
+                      String newPrice = in.readLine().trim();
+  
+                      System.out.print("Enter new description: ");
+                      String newDescription = in.readLine().trim();
+  
+                      String updateQuery = "UPDATE Items SET price = " + newPrice + ", description = '" + newDescription + "' " +
+                                           "WHERE itemName = '" + existingItem + "';";
+                      
+                      esql.executeUpdate(updateQuery);
+                      System.out.println("Item updated successfully!");
+                      break;
+  
+                  case 3: // Exit
+                      menuLoop = false;
+                      break;
+  
+                  default:
+                      System.out.println("Invalid choice. Try again.");
+              }
+          }
+      } catch (Exception e) {
+          System.err.println("Error: " + e.getMessage());
+      }
+  }
+  
+  
+  
+
    public static void updateUser(PizzaStore esql) {}
 
 
