@@ -1,3 +1,6 @@
 sql/
 data/
-report.pdf
+CS166_report.pdf
+.DS_Store/
+java/.DS_Store/
+java/scripts/.DS_Store/
